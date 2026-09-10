@@ -1,3 +1,29 @@
+> ## nRFClaw / NINASENSE Hardware Port
+>
+> This development fork adds support for **NINASENSE Rev 1.1** and
+> **HALFMOON Rev 1.0**, two nRF52832-based hardware platforms using
+> **nRF5 SDK 17 / S132 7.2.0**.
+>
+> Additional hardware integration includes:
+>
+> - LLCC68 LoRa support
+> - Battery monitoring
+> - nRFClaw BLE DFU bootloader compatibility
+> - Application-only `.bin` generation for nRFClaw Studio
+> - NINASENSE and HALFMOON board definitions
+>
+> See **[nRFClaw Hardware Port Documentation](README_NRFCLAW.md)** for
+> build instructions, hardware pinouts, LoRa API, DFU and examples.
+>
+> This repository is based on the original **Espruino** project.
+> Generic improvements developed while implementing this port are intended
+> to be contributed upstream where appropriate.
+>
+> Espruino is a trademark of Pur3 Ltd. NINASENSE and HALFMOON are
+> third-party hardware platforms and are not official Espruino boards.
+>
+> The original Espruino README follows below.
+
 Espruino JavaScript for Microcontrollers
 ========================================
 <pre>

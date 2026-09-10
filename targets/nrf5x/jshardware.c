@@ -2370,6 +2370,11 @@ bool jshFlashWriteProtect(uint32_t addr) {
 /* It's vital we don't let anyone screw with the softdevice or bootloader.
  * Recovering from changes would require soldering onto SWDIO and SWCLK pads!
  */
+#if defined(NINASENSE) || defined(HALFMOON)
+  /* nRFClaw layout: protect MBR/SoftDevice and bootloader/metadata. */
+  if (addr<0x26000) return true; // S132 7.2.0 / MBR
+  if (addr>=0x7A000 && addr<0x80000) return true; // nRFClaw bootloader + metadata
+#endif
 #if defined(PUCKJS) || defined(PIXLJS) || defined(MDBT42Q) || defined(BANGLEJS_F18)
   if (addr<0x1f000) return true; // softdevice
   if (addr>=0x78000 && addr<0x80000) return true; // bootloader

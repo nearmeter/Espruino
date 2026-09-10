@@ -231,16 +231,82 @@ if [ "$PROVISION_NRF_SDK15_3" = "1" ]; then
 fi
 if [ "$PROVISION_NRF_SDK17" = "1" ]; then
     if [ ! -d "targetlibs/nrf5x_17/components" ]; then
-        echo Installing NRF SDK 17.0 to targetlibs/nrf5x_17/components
-        curl -Ls https://github.com/espruino/EspruinoBuildTools/raw/master/nrf52/nRF5_SDK_17.0.2_d674dde_no_docs_unix -o nRF5_SDK_17.zip
-        # This is nRF5_SDK_17.0.2_d674dde.zip without the docs/examples folder, and with line endings converted to unix (for patch)
-        unzip -q -o nRF5_SDK_17.zip
-        cp -r nRF5_SDK_17.0.2_d674dde/external/* targetlibs/nrf5x_17/external
-        rm -rf nRF5_SDK_17.0.2_d674dde/external
-        cp -r nRF5_SDK_17.0.2_d674dde/* targetlibs/nrf5x_17
-        rm -rf nRF5_SDK_17.zip nRF5_SDK_17.0.2_d674dde
+        echo Installing NRF SDK 17.0.2 to targetlibs/nrf5x_17
+
+        SDK17_URL="https://developer.nordicsemi.com/nRF51_SDK/nRF5_SDK_v17.x.x/nRF5_SDK_17.0.2_d674dde.zip"
+        SDK17_ZIP="nRF5_SDK_17.zip"
+        SDK17_DIR="nRF5_SDK_17.0.2_d674dde"
+
+        curl -fL "$SDK17_URL" -o "$SDK17_ZIP" || {
+            echo "ERROR: failed to download nRF5 SDK 17.0.2"
+            exit 1
+        }
+
+        unzip -q -o "$SDK17_ZIP" || {
+            echo "ERROR: invalid nRF5 SDK 17.0.2 archive"
+            exit 1
+        }
+
+        mkdir -p targetlibs/nrf5x_17/external
+
+        cp -r "$SDK17_DIR"/external/* \
+              targetlibs/nrf5x_17/external/ || {
+            echo "ERROR: failed to install SDK17 external files"
+            exit 1
+        }
+
+        rm -rf "$SDK17_DIR"/external
+
+        cp -r "$SDK17_DIR"/* \
+              targetlibs/nrf5x_17/ || {
+            echo "ERROR: failed to install SDK17 files"
+            exit 1
+        }
+
+
+	#
+	# Nordic SDK17 provides the micro-ecc integration/build structure,
+	# but not the upstream micro-ecc source files required by Espruino.
+	# Reuse the version already carried by Espruino's SDK15.3 tree.
+	#
+	if [ ! -f targetlibs/nrf5x_17/external/micro-ecc/uECC.c ]; then
+    		echo "Installing micro-ecc sources for SDK17"
+
+    		find targetlibs/nrf5x_15_3/external/micro-ecc \
+      		-maxdepth 1 -type f \
+      		-exec cp -a {} targetlibs/nrf5x_17/external/micro-ecc/ \;
+	fi
+
+	if [ ! -f targetlibs/nrf5x_17/external/micro-ecc/uECC.h ] || \
+   		[ ! -f targetlibs/nrf5x_17/external/micro-ecc/uECC.c ]; then
+    			echo "ERROR: micro-ecc sources were not installed correctly"
+    		exit 1
+	fi
+
+        #
+        # Nordic's official SDK17 archive uses CRLF line endings.
+        # Convert only files modified by Espruino patches.
+        #
+        sed -i 's/\r$//' \
+          targetlibs/nrf5x_17/modules/nrfx/mdk/nrf.h \
+          targetlibs/nrf5x_17/components/libraries/bootloader/nrf_bootloader.c \
+          targetlibs/nrf5x_17/components/ble/ble_services/ble_nus/ble_nus.c \
+          targetlibs/nrf5x_17/components/ble/ble_services/ble_nus/ble_nus.h \
+          targetlibs/nrf5x_17/integration/nrfx/legacy/nrf_drv_usbd_errata.h
+
         echo "======================================================"
-        cat targetlibs/nrf5x_17/patches/* | patch -p1
+        echo "Applying nRF5 SDK17 patches"
+        echo "======================================================"
+
+        for PATCH in targetlibs/nrf5x_17/patches/*.patch; do
+            echo "Applying $PATCH"
+            patch --batch -p1 < "$PATCH" || {
+                echo "ERROR: failed applying $PATCH"
+                exit 1
+            }
+        done
+
+        rm -rf "$SDK17_ZIP" "$SDK17_DIR"
     fi
 fi
 #--------------------------------------------------------------------------------

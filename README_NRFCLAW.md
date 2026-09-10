@@ -144,6 +144,15 @@ This fork uses:
 nRF5 SDK 17
 S132 SoftDevice 7.2.0
 ```
+# SDK17 provisioning
+
+NINASENSE and HALFMOON use Nordic nRF5 SDK 17.0.2 with
+SoftDevice S132 7.2.0.
+
+A clean clone can provision the required SDK automatically:
+
+```bash
+./scripts/provision.sh NINASENSE
 
 ### Build NINASENSE
 

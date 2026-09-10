@@ -49,6 +49,7 @@
 #define NRFX_UARTE0_ENABLED 0
 #undef NRFX_UARTE1_ENABLED
 #define NRFX_UARTE1_ENABLED 0
+
 #ifdef ESPR_USE_SPI3
 #define NRFX_SPIM3_ENABLED 1
 #endif // ESPR_USE_SPI3
@@ -92,7 +93,8 @@
 #define UART0_CONFIG_USE_EASY_DMA 1
 #define UART1_ENABLED 1 // enable UART1 as well on nRF52840
 #define UART1_CONFIG_USE_EASY_DMA 1
-#else // SDKs before 15
+#else // nRF52832 / UART legacy
+#define UART_LEGACY_SUPPORT 1
 #define UART_EASY_DMA_SUPPORT 0
 #define UART0_CONFIG_USE_EASY_DMA 0
 #endif

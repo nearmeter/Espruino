@@ -2624,7 +2624,7 @@ static void ble_stack_init() {
     // Enable BLE stack.
     err_code = nrf_sdh_ble_enable(&app_ram_base);
     if (err_code == NRF_ERROR_NO_MEM)
-      jsiConsolePrintf("NO_MEM: set RAM_START=0x%x\n", ram_start);
+      jsiConsolePrintf("NO_MEM: set RAM_START=0x%x\n", app_ram_base);
     APP_ERROR_CHECK(err_code);
 
     // Register a handler for BLE events.

@@ -710,9 +710,13 @@ endif # BOOTLOADER ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ DON'T USE STUFF AB
 
 # =========================================================================
 
-.PHONY:  proj
+.PHONY: proj appbin
 
-all: 	 proj
+all: proj
+
+ifneq ($(filter NINASENSE HALFMOON,$(BOARD)),)
+all: appbin
+endif
 # =========================================================================
 PININFOFILE=$(GENDIR)/jspininfo
 
@@ -908,6 +912,13 @@ endif	    # ---------------------------------------------------
 
 lst: $(PROJ_NAME).lst
 
+# Raw application image for nRFClaw DFU/Studio.
+# Generated directly from the ELF, so offset 0 of the BIN corresponds to
+# the application vector table (0x26000 on NINASENSE/HALFMOON).
+appbin: $(PROJ_NAME).elf
+	@echo GEN $(PROJ_NAME).app.bin
+	$(Q)$(OBJCOPY) -O binary $(PROJ_NAME).elf $(PROJ_NAME).app.bin
+
 clean:
 	@echo Cleaning targets
 	$(Q)rm -rf $(OBJDIR)/* $(BINDIR)/build $(BINDIR)/main
@@ -916,6 +927,7 @@ clean:
 	$(Q)rm -f $(PROJ_NAME).elf
 	$(Q)rm -f $(PROJ_NAME).hex
 	$(Q)rm -f $(PROJ_NAME).bin
+	$(Q)rm -f $(PROJ_NAME).app.bin
 	$(Q)rm -f $(PROJ_NAME).srec
 	$(Q)rm -f $(PROJ_NAME).lst
 	$(Q)rm -f $(PROJ_NAME).app_hex
